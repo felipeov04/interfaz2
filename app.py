@@ -3,44 +3,64 @@ from textblob import TextBlob
 from googletrans import Translator
 
 translator = Translator()
-st.title('Uso de textblob')
 
-st.subheader(" escribe en el campo de texto la frase que deseas analizar")
+# Título y descripción
+st.title('Análisis de Sentimientos con TextBlob')
+st.write("Esta aplicación analiza la polaridad y subjetividad de un texto en español o inglés.")
+
+# Sidebar con información
 with st.sidebar:
-               st.subheader("Polaridad y Subjetividad")
-               ("""
-                Polaridad: Indica si el sentimiento expresado en el texto es positivo, negativo o neutral. 
-                Su valor oscila entre -1 (muy negativo) y 1 (muy positivo), con 0 representando un sentimiento neutral.
-                
-               Subjetividad: Mide cuánto del contenido es subjetivo (opiniones, emociones, creencias) frente a objetivo
-               (hechos). Va de 0 a 1, donde 0 es completamente objetivo y 1 es completamente subjetivo.
+    st.subheader("¿Cómo funciona el análisis?")
+    st.markdown("""
+    **Polaridad:** 
+    - Rango de -1 (muy negativo) a 1 (muy positivo).
+    - 0 es neutral.
 
-                 """
-               ) 
+    **Subjetividad:**  
+    - Rango de 0 (hechos) a 1 (opiniones/emociones).
+    """)
+    st.markdown("---")
+    st.write("💡 Consejo: El análisis funciona mejor en inglés, se traducirá automáticamente.")
 
+# Secciones con Tabs
+tab1, tab2 = st.tabs(["📊 Analizar Sentimiento", "📝 Corrección de Texto"])
 
-with st.expander('Analizar Polaridad y Subjetividad en un texto'):
-    text1 = st.text_area('Escribe por favor: ')
-    if text1:
+# --- TAB 1: Análisis de Sentimiento ---
+with tab1:
+    text = st.text_area("✍️ Escribe una frase para analizar:")
 
-        #translation = translator.translate(text1, src="es", dest="en")
-        #trans_text = translation.text
-        #blob = TextBlob(trans_text)
-        blob = TextBlob(text1)
-       
-        
-        st.write('Polarity: ', round(blob.sentiment.polarity,2))
-        st.write('Subjectivity: ', round(blob.sentiment.subjectivity,2))
-        x=round(blob.sentiment.polarity,2)
-        if x >= 0.5:
-            st.write( 'Es un sentimiento Positivo 😊')
-        elif x <= -0.5:
-            st.write( 'Es un sentimiento Negativo 😔')
-        else:
-            st.write( 'Es un sentimiento Neutral 😐')
+    if text:
+        try:
+            translation = translator.translate(text, src="es", dest="en")
+            trans_text = translation.text
+            blob = TextBlob(trans_text)
 
-with st.expander('Corrección en inglés'):
-       text2 = st.text_area('Escribe por favor: ',key='4')
-       if text2:
-          blob2=TextBlob(text2)
-          st.write((blob2.correct())) 
+            polarity = round(blob.sentiment.polarity, 2)
+            subjectivity = round(blob.sentiment.subjectivity, 2)
+
+            st.write(f"🔹 **Polaridad:** {polarity}")
+            st.write(f"🔹 **Subjetividad:** {subjectivity}")
+
+            # Variaciones en el análisis
+            if polarity > 0.5:
+                st.success("😊 El sentimiento es **muy positivo**.")
+            elif 0.1 < polarity <= 0.5:
+                st.success("🙂 El sentimiento es **ligeramente positivo**.")
+            elif -0.1 <= polarity <= 0.1:
+                st.info("😐 El sentimiento es **neutral**.")
+            elif -0.5 < polarity < -0.1:
+                st.warning("🙁 El sentimiento es **ligeramente negativo**.")
+            else:
+                st.error("😔 El sentimiento es **muy negativo**.")
+
+        except Exception as e:
+            st.error(f"❌ Error en la traducción o análisis: {e}")
+
+# --- TAB 2: Corrección en Inglés ---
+with tab2:
+    text2 = st.text_area("✍️ Escribe una frase en inglés para corregir:", key="correct_text")
+    
+    if text2:
+        blob2 = TextBlob(text2)
+        st.write("✏️ **Corrección sugerida:**")
+        st.success(blob2.correct())
