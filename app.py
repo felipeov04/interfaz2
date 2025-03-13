@@ -5,7 +5,7 @@ from googletrans import Translator
 translator = Translator()
 st.title('Uso de textblob')
 
-st.subheader("Por favor escribe en el campo de texto la frase que deseas analizar")
+st.subheader(" escribe en el campo de texto la frase que deseas analizar")
 with st.sidebar:
                st.subheader("Polaridad y Subjetividad")
                ("""
