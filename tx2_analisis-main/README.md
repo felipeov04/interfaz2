@@ -1,1 +1,0 @@
-# tx2_analisis
